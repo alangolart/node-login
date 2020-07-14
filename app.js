@@ -3,6 +3,9 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const rateLimit = require('express-rate-limit')
 
+const config = require('./src/config/index')
+const database = require('./src/config/database')
+
 const notFound = require('./src/middlewares/notFound')
 const errorHandler = require('./src/middlewares/errorHandler')
 
@@ -25,10 +28,13 @@ const configureExpress = () => {
   })
   app.use(notFound)
   app.use(errorHandler)
+  app.database = database
   return app
 }
 
 module.exports = async () => {
   const app = configureExpress()
+  await app.database.connect()
+  console.log(`Connected to DB: ${config.db.name}`)
   return app
 }

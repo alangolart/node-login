@@ -15,9 +15,24 @@ async function startServer() {
         console.log(`worker ${worker.process.pid} died`)
       })
     } else {
-      app.listen(config.server.port || 3030)
+      const server = app.listen(config.server.port || 3030)
       console.log(`🚀 Listening on port ${config.server.port}`)
       console.log(`Worker ${process.pid} started`)
+      const exitSignals = ['SIGINT', 'SIGTERM', 'SIGQUIT']
+      exitSignals.map((sig) =>
+        process.on(sig, () =>
+          server.close((err) => {
+            if (err) {
+              console.error(err)
+              process.exit(1)
+            }
+            app.database.connection.close(function () {
+              console.info('Database connection closed!')
+              process.exit(0)
+            })
+          })
+        )
+      )
     }
   } catch (error) {
     console.error(error)
