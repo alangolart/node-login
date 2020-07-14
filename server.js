@@ -1,12 +1,11 @@
 const setupApp = require('./app')
-require('dotenv').config({
-  path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
-})
+const config = require('./src/config/index')
 
 async function startServer() {
   try {
-    setupApp.listen(process.env.SERVER_PORT || 3039)
-    console.log(`🚀 Listening on port ${process.env.SERVER_PORT}`)
+    const app = await setupApp()
+    app.listen(config.server.port || 3039)
+    console.log(`🚀 Listening on port ${config.server.port}`)
   } catch (error) {
     console.error(error)
   }
