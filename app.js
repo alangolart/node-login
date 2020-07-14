@@ -9,6 +9,8 @@ const database = require('./src/config/database')
 const notFound = require('./src/middlewares/notFound')
 const errorHandler = require('./src/middlewares/errorHandler')
 
+const userRouter = require('./src/routes/userRoutes.js')
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -26,6 +28,7 @@ const configureExpress = () => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     next()
   })
+  app.use('/user', userRouter)
   app.use(notFound)
   app.use(errorHandler)
   app.database = database
