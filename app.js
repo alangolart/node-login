@@ -3,6 +3,9 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const rateLimit = require('express-rate-limit')
 
+const notFound = require('./src/middlewares/notFound')
+const errorHandler = require('./src/middlewares/errorHandler')
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -20,6 +23,8 @@ const configureExpress = () => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     next()
   })
+  app.use(notFound)
+  app.use(errorHandler)
   return app
 }
 
