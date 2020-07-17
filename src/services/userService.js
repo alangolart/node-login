@@ -1,5 +1,11 @@
 const { findEmail, createUser, updateConfirmedEmail } = require('../repositories/index')
-const { hashPassword, generateEmailToken, verifyToken, sendEmail } = require('../helpers/index')
+const {
+  hashPassword,
+  generateEmailToken,
+  verifyToken,
+  checkRedisInvalidToken,
+  insertRedisList,
+} = require('../helpers/index')
 const Queue = require('../lib/Queue')
 const config = require('../config/index')
 
@@ -20,8 +26,11 @@ async function register(client) {
 }
 
 async function registerConfirmation(token) {
+  const previouslyUsedToken = await checkRedisInvalidToken('registerConfirmationTokens', token)
+  if (previouslyUsedToken) return previouslyUsedToken
   const { user } = await verifyToken(token, config.emailSecret)
   await updateConfirmedEmail(user)
+  await insertRedisList('registerConfirmationTokens', token)
   return { status: 200, message: 'Email confirmed' }
 }
 
