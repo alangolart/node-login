@@ -7,8 +7,12 @@ async function findEmail(email) {
 async function createUser(user) {
   return User.create(user)
 }
+async function updateConfirmedEmail(userId) {
+  return User.findOneAndUpdate({ _id: userId }, { confirmedEmail: true })
+}
 
 module.exports = {
   findEmail,
   createUser,
+  updateConfirmedEmail,
 }

@@ -1,5 +1,13 @@
-const { findEmail, createUser } = require('../repositories/index')
-const { hashPassword } = require('../helpers/index')
+const { findEmail, createUser, updateConfirmedEmail } = require('../repositories/index')
+const {
+  hashPassword,
+  generateEmailToken,
+  verifyToken,
+  checkRedisInvalidToken,
+  insertRedisList,
+} = require('../helpers/index')
+const Queue = require('../lib/Queue')
+const config = require('../config/index')
 
 async function register(client) {
   const { email, password, confirmPassword } = client
@@ -9,7 +17,21 @@ async function register(client) {
   const user = client
   user.password = await hashPassword(password)
   const savedUser = await createUser(user)
-  return { status: 200, message: 'User created', savedUser }
+  const emailToken = await generateEmailToken(savedUser)
+  const url = `${config.server.host}:${config.server.port}/user/confirmation/${emailToken}`
+  const emailSubject = 'Confirm Email'
+  const body = `Please click this email to confirm your email: <a href="${url}">${url}</a>`
+  Queue.add('RegistationMail', { email, emailSubject, body })
+  return { status: 200, message: 'Confirmation email sent', token: emailToken }
 }
 
-module.exports = { register }
+async function registerConfirmation(token) {
+  const previouslyUsedToken = await checkRedisInvalidToken('registerConfirmationTokens', token)
+  if (previouslyUsedToken) return previouslyUsedToken
+  const { user } = await verifyToken(token, config.emailSecret)
+  await updateConfirmedEmail(user)
+  await insertRedisList('registerConfirmationTokens', token)
+  return { status: 200, message: 'Email confirmed' }
+}
+
+module.exports = { register, registerConfirmation }
