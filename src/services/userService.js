@@ -1,5 +1,6 @@
 const { findEmail, createUser, updateConfirmedEmail } = require('../repositories/index')
 const { hashPassword, generateEmailToken, verifyToken, sendEmail } = require('../helpers/index')
+const Queue = require('../lib/Queue')
 const config = require('../config/index')
 
 async function register(client) {
@@ -14,7 +15,7 @@ async function register(client) {
   const url = `${config.server.host}:${config.server.port}/user/confirmation/${emailToken}`
   const emailSubject = 'Confirm Email'
   const body = `Please click this email to confirm your email: <a href="${url}">${url}</a>`
-  await sendEmail(email, emailSubject, body)
+  Queue.add('RegistationMail', { email, emailSubject, body })
   return { status: 200, message: 'Confirmation email sent', token: emailToken }
 }
 
