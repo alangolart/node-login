@@ -1,4 +1,4 @@
-const { body, param, validationResult } = require('express-validator')
+const { header, body, param, validationResult } = require('express-validator')
 
 const emailValidation = () => {
   return [body('email').isEmail().normalizeEmail({ all_lowercase: true })]
@@ -15,6 +15,9 @@ const mobileNumberValidation = () => {
 const tokenValidation = () => {
   return [param('token').isJWT()]
 }
+const passwordTokenValidation = () => {
+  return [header('passwordToken').isJWT()]
+}
 
 const registerValidation = () => {
   return [
@@ -26,6 +29,17 @@ const registerValidation = () => {
 }
 const registerConfirmationValidation = () => {
   return [tokenValidation()]
+}
+const resetPasswordValidation = () => {
+  return [emailValidation()]
+}
+const newPasswordValidation = () => {
+  return [
+    emailValidation(),
+    passwordValidation(),
+    confirmPasswordValidation(),
+    passwordTokenValidation(),
+  ]
 }
 
 const validate = (req, res, next) => {
@@ -43,5 +57,7 @@ const validate = (req, res, next) => {
 module.exports = {
   registerValidation,
   registerConfirmationValidation,
+  resetPasswordValidation,
+  newPasswordValidation,
   validate,
 }
