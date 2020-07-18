@@ -37,6 +37,17 @@ async function generateEmailToken(savedUser) {
     }
   )
 }
+async function generateResetPasswordToken(user) {
+  return jwt.sign(
+    {
+      user: user.id,
+    },
+    config.resetEmailSecret,
+    {
+      expiresIn: '1d',
+    }
+  )
+}
 async function verifyToken(token, tokenSecret) {
   return jwt.verify(token, tokenSecret)
 }
@@ -55,6 +66,7 @@ module.exports = {
   sendEmail,
   hashPassword,
   generateEmailToken,
+  generateResetPasswordToken,
   verifyToken,
   checkRedisInvalidToken,
   insertRedisList,
