@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 const sendgridTransport = require('nodemailer-sendgrid-transport')
 const config = require('../config/index')
+// eslint-disable-next-line import/order
+const smsClient = require('twilio')(config.twilio.accountSid, config.twilio.token)
 const redisClient = require('../config/redis')
 
 const transporter = nodemailer.createTransport(
@@ -21,10 +23,43 @@ async function sendEmail(emailTo, subject, body) {
     html: body,
   })
 }
-
+async function sendSms(smsTo, body) {
+  return smsClient.messages.create({
+    body,
+    from: config.twilio.number,
+    to: smsTo,
+  })
+}
 async function hashPassword(password) {
   const salt = await bcrypt.genSalt(12)
   return bcrypt.hash(password, salt)
+}
+async function comparePassword(password, dbPassword) {
+  return bcrypt.compare(password, dbPassword)
+}
+async function generateFirstStepLoginToken(user) {
+  return jwt.sign(
+    {
+      userId: user._id.toString(),
+      email: user.email,
+    },
+    config.firstStepToken,
+    {
+      expiresIn: '1h',
+    }
+  )
+}
+async function generateLoginToken(user) {
+  return jwt.sign(
+    {
+      userId: user._id.toString(),
+      email: user.email,
+    },
+    config.token,
+    {
+      expiresIn: '7d',
+    }
+  )
 }
 async function generateEmailToken(savedUser) {
   return jwt.sign(
@@ -64,7 +99,11 @@ async function insertRedisList(list, token) {
 
 module.exports = {
   sendEmail,
+  sendSms,
   hashPassword,
+  comparePassword,
+  generateFirstStepLoginToken,
+  generateLoginToken,
   generateEmailToken,
   generateResetPasswordToken,
   verifyToken,
