@@ -41,11 +41,19 @@ const newPasswordValidation = () => {
     passwordTokenValidation(),
   ]
 }
-
-const loginValidation = () => {
-  return [emailValidation(), passwordValidation()]
+const firstStepTokenValidation = () => {
+  return [header('firstStepToken').isJWT()]
+}
+const sixDigitCodeValidation = () => {
+  return [body('sixDigitCode').isInt().isLength({ min: 6, max: 6 })]
 }
 
+const firstStepLoginValidation = () => {
+  return [emailValidation(), passwordValidation()]
+}
+const secondStepLoginValidation = () => {
+  return [sixDigitCodeValidation(), firstStepTokenValidation()]
+}
 const validate = (req, res, next) => {
   const errors = validationResult(req)
   if (errors.isEmpty()) {
@@ -63,6 +71,7 @@ module.exports = {
   registerConfirmationValidation,
   resetPasswordValidation,
   newPasswordValidation,
-  loginValidation,
+  firstStepLoginValidation,
+  secondStepLoginValidation,
   validate,
 }

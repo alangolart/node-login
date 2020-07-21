@@ -1,7 +1,22 @@
 const router = require('express').Router()
-const { loginValidation, validate } = require('../helpers/validator.js')
+const {
+  firstStepLoginValidation,
+  secondStepLoginValidation,
+  validate,
+} = require('../helpers/validator.js')
 const authController = require('../controllers/authController')
 
-router.post('/login', loginValidation(), validate, authController.postLogin)
+router.post(
+  '/firstStepLogin',
+  firstStepLoginValidation(),
+  validate,
+  authController.postFirstStepLogin
+)
+router.post(
+  '/secondStepLogin',
+  secondStepLoginValidation(),
+  validate,
+  authController.postSecondStepLogin
+)
 
 module.exports = router
