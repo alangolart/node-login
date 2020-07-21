@@ -26,6 +26,21 @@ async function hashPassword(password) {
   const salt = await bcrypt.genSalt(12)
   return bcrypt.hash(password, salt)
 }
+async function comparePassword(password, dbPassword) {
+  return bcrypt.compare(password, dbPassword)
+}
+async function generateLoginToken(user) {
+  return jwt.sign(
+    {
+      userId: user._id.toString(),
+      email: user.email,
+    },
+    config.token,
+    {
+      expiresIn: '7d',
+    }
+  )
+}
 async function generateEmailToken(savedUser) {
   return jwt.sign(
     {
@@ -65,6 +80,8 @@ async function insertRedisList(list, token) {
 module.exports = {
   sendEmail,
   hashPassword,
+  comparePassword,
+  generateLoginToken,
   generateEmailToken,
   generateResetPasswordToken,
   verifyToken,

@@ -42,6 +42,10 @@ const newPasswordValidation = () => {
   ]
 }
 
+const loginValidation = () => {
+  return [emailValidation(), passwordValidation()]
+}
+
 const validate = (req, res, next) => {
   const errors = validationResult(req)
   if (errors.isEmpty()) {
@@ -59,5 +63,6 @@ module.exports = {
   registerConfirmationValidation,
   resetPasswordValidation,
   newPasswordValidation,
+  loginValidation,
   validate,
 }

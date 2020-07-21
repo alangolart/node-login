@@ -10,6 +10,7 @@ const notFound = require('./src/middlewares/notFound')
 const errorHandler = require('./src/middlewares/errorHandler')
 
 const userRoute = require('./src/routes/userRoutes.js')
+const authRoute = require('./src/routes/authRoutes.js')
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -29,6 +30,7 @@ const configureExpress = () => {
     next()
   })
   app.use('/user', userRoute)
+  app.use('/auth', authRoute)
   app.use(notFound)
   app.use(errorHandler)
   app.database = database
