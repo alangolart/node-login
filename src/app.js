@@ -3,14 +3,14 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const rateLimit = require('express-rate-limit')
 
-const config = require('./src/config/index')
-const database = require('./src/config/database')
+const config = require('./config/index')
+const database = require('./config/database')
 
-const notFound = require('./src/middlewares/notFound')
-const errorHandler = require('./src/middlewares/errorHandler')
+const notFound = require('./middlewares/notFound')
+const errorHandler = require('./middlewares/errorHandler')
 
-const userRoute = require('./src/routes/userRoutes.js')
-const authRoute = require('./src/routes/authRoutes.js')
+const userRoute = require('./routes/userRoutes.js')
+const authRoute = require('./routes/authRoutes.js')
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
