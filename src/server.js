@@ -1,5 +1,5 @@
 const setupApp = require('./app')
-const config = require('./src/config/index')
+const config = require('./config/index')
 
 async function startServer() {
   try {

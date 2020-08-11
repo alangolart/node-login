@@ -4,10 +4,10 @@
   "description": "A Register and Login API developed for study purposes",
   "main": "server.js",
   "scripts": {
-    "start": "pm2 start server.js -i 0 && pm2 start queue.js --no-daemon",
+    "start": "pm2 start src/server.js -i 0 && pm2 start src/queue.js --no-daemon",
     "dev": "npm-run-all -p dev:*",
-    "dev:server": "nodemon server.js --ignore __tests__",
-    "dev:queue": "nodemon queue.js",
+    "dev:server": "nodemon src/server.js --ignore __tests__",
+    "dev:queue": "nodemon src/queue.js",
     "lint": "eslint '**/*.js'"
   },
   "repository": {
