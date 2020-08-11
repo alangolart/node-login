@@ -6,4 +6,5 @@ module.exports = {
   verificationCodeSent: 'Verification code sent',
   invalidToken: 'Invalid Token',
   invalidVerificationCode: 'Invalid Verification code',
+  unableSendCode: 'Unable to send the code',
 }

@@ -54,6 +54,9 @@ const firstStepLoginValidation = () => {
 const secondStepLoginValidation = () => {
   return [sixDigitCodeValidation(), firstStepTokenValidation()]
 }
+const reSendSecondStepCodeValidation = () => {
+  return [firstStepTokenValidation()]
+}
 const validate = (req, res, next) => {
   const errors = validationResult(req)
   if (errors.isEmpty()) {
@@ -73,5 +76,6 @@ module.exports = {
   newPasswordValidation,
   firstStepLoginValidation,
   secondStepLoginValidation,
+  reSendSecondStepCodeValidation,
   validate,
 }

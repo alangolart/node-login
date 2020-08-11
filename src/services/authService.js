@@ -1,5 +1,5 @@
 const config = require('../config/index')
-const { findEmail, findUserSecondStep, saveUser } = require('../repositories/index')
+const { findEmail, findUserById, findUserSecondStep, saveUser } = require('../repositories/index')
 const {
   generateFirstStepLoginToken,
   generateLoginToken,
@@ -51,8 +51,28 @@ async function secondStepLogin(body, firstStepToken) {
   const token = await generateLoginToken(user)
   return { status: 200, user: user.email, message: authConstants.loginSuccess, token }
 }
+async function reSendSecondStepCode(firstStepToken) {
+  const verifiedToken = await verifyToken(firstStepToken, config.firstStepToken)
+  const { userId } = verifiedToken
+  const user = await findUserById(userId)
+  const { email, phoneNumber } = user
+  if (user.twoFactorAuth === false) {
+    return { status: 400, message: authConstants.unableSendCode }
+  }
+  const sixDigitCode = generateSixDigitCode()
+  user.secondStepCode = sixDigitCode
+  user.secondStepCodeExpiration = generateSecondStepCodeExpiration()
+  const emailSubject = 'Verification Code'
+  const body = `Your Verification Code: ${sixDigitCode}`
+  const smsTo = `+${phoneNumber}`
+  await saveUser(user)
+  Queue.add('SendSecondStepCodeMail', { email, emailSubject, body })
+  Queue.add('SendSecondStepCodeSms', { smsTo, body })
+  return { status: 200, message: authConstants.verificationCodeSent, sixDigitCode }
+}
 
 module.exports = {
   firstStepLogin,
   secondStepLogin,
+  reSendSecondStepCode,
 }
